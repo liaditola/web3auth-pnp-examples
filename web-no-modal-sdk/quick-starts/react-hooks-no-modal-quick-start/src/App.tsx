@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 import "./App.css";
 import { useWeb3Auth } from "@web3auth/no-modal-react-hooks";
-import { ADAPTER_STATUS, WALLET_ADAPTERS } from "@web3auth/base";
+import { ADAPTER_STATUS, CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
 // IMP START - Blockchain Calls
 import RPC from "./ethersRPC";
 // import RPC from "./viemRPC";
@@ -10,7 +10,32 @@ import RPC from "./ethersRPC";
 // IMP END - Blockchain Calls
 
 function App() {
-  const { status, connectTo, userInfo, provider } = useWeb3Auth();
+  const { status, connectTo, userInfo, provider, logout, web3Auth } = useWeb3Auth();
+  // const torusAdapter = new TorusWalletAdapter({
+  //   sessionTime: 3600, // 1 hour in seconds
+  //   // web3AuthNetwork: "sapphire_mainnet",
+  //   // chainConfig: {
+  //   //   chainNamespace: CHAIN_NAMESPACES.EIP155,
+  //   //   chainId: "0x1",
+  //   //   rpcTarget: "https://rpc.ankr.com/eth", // This is the public RPC we have added, please pass on your own endpoint while creating an app
+  //   // },
+  // });
+  // web3Auth?.configureAdapter(torusAdapter);
+  
+  const newChain = {
+    displayName: "Ethereum Mainnet",
+    chainId: "0x1",
+    rpcTarget: `https://rpc.ankr.com/eth`,
+    blockExplorerUrl: "https://etherscan.io/",
+    ticker: "USDT",
+    tickerName: "Tether stablecoin cryptocurrency",
+    logo: "https://images.toruswallet.io/eth.svg",
+    chainNamespace: CHAIN_NAMESPACES.EIP155,
+  }
+  web3Auth?.addChain(newChain);
+  web3Auth?.switchChain({
+    chainId: newChain.chainId
+  });
 
   const login = async () => {
     // IMP START - Login
@@ -20,7 +45,7 @@ function App() {
     // IMP END - Login
   };
 
-  const logout = async () => {
+  const logoutAction = async () => {
     // IMP START - Logout
     await logout();
     // IMP END - Logout
@@ -44,7 +69,8 @@ function App() {
       return;
     }
     const balance = await RPC.getBalance(provider);
-    uiConsole(balance);
+    const USDTBalance = await RPC.getUSDTBalance(provider);
+    uiConsole(`ETH: ${balance}`, `USDT: ${USDTBalance}`);
   };
 
   const signMessage = async () => {
@@ -62,6 +88,7 @@ function App() {
       return;
     }
     uiConsole("Sending Transaction...");
+    uiConsole(JSON.stringify(provider));
     const transactionReceipt = await RPC.sendTransaction(provider);
     uiConsole(transactionReceipt);
   };
@@ -104,7 +131,7 @@ function App() {
           </button>
         </div>
         <div>
-          <button onClick={logout} className="card">
+          <button onClick={logoutAction} className="card">
             Log Out
           </button>
         </div>

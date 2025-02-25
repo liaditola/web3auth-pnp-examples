@@ -1,3 +1,10 @@
+
+cd web-no-modal-sdk\quick-starts\react-hooks-no-modal-quick-start
+npm install
+npm run start
+
+
+
 # Web3Auth Example from Guides and Integration Builder
 
 [Web3Auth](https://web3auth.io) is a plugable auth infrastructure for Web3
